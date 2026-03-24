@@ -1,4 +1,44 @@
 # YellowStone Client Onboarding Form
 
-Client-facing onboarding form for YellowStone PMS implementation.
-Built by Mike Sutsos
+A professional, client-facing onboarding form built for YellowStone PMS 
+implementation by RBS. Sent to new clients to collect all information 
+required before their implementation begins.
+
+## What It Does
+
+Guides new YellowStone clients through a structured 11-section onboarding 
+form covering everything the implementation team needs to configure their 
+system from day one. Built as a single HTML file — no installation, no 
+dependencies, works in any browser.
+
+## Sections
+
+1. **Yellowstone Users** — Collect names and emails for all platform users
+2. **Business Information** — Legal name, address, phone, correspondence email
+3. **Business Email Templates** — Collect or note standardized customer emails
+4. **Reservation Types** — Types, check-in/out times, nights, included meals
+5. **Activities** — Bookable activities, times, and on-property locations
+6. **Lodging & Rooms** — Locations, room names, capacity, and room types
+7. **Pricing & Rates** — Deposits, tax rates, gratuity, rates list, cancellation policy
+8. **Memberships** — Membership tiers, fees, and renewal frequency
+9. **Guides & Employees** — Staff directory with titles and contact info
+10. **Guests** — Existing guest list via CSV upload
+11. **Notes** — General comments, questions for the Implementation Manager, preferred contact method
+
+## Features
+
+- Sticky progress bar with clickable section navigation
+- All sections collapsible and expandable
+- Dynamic row entry for users, staff, rooms, rates, and more
+- Smart conditional fields — answer boxes appear or hide based on selections
+- Custom pill-style meal multi-select for reservation types
+- CSV file upload for guest list import
+- ADA / WCAG 2.1 compliant — keyboard navigable, screen reader friendly
+- RBS and YellowStone dual branding throughout
+- Mobile responsive
+- Success confirmation screen on submit
+
+## Built By Mike Sutsos
+
+RBS — Empowering hospitality businesses worldwide to be profitable  
+[rbsgo.com](https://rbsgo.com)
