@@ -1280,15 +1280,15 @@
           <span class="field-label">Gratuity</span>
           <div class="checkbox-group" id="gratuityOptions">
             <div class="checkbox-item">
-              <input type="radio" name="gratuity_type" id="grat0" value="none" onchange="handleGratuity()" checked>
+              <input type="radio" name="gratuity_type" id="grat0" value="none" onchange="handleGratuity();this.dataset.touched='1'">
               <label for="grat0">We do not currently take gratuities</label>
             </div>
             <div class="checkbox-item">
-              <input type="radio" name="gratuity_type" id="grat1" value="discretion" onchange="handleGratuity()">
+              <input type="radio" name="gratuity_type" id="grat1" value="discretion" onchange="handleGratuity();this.dataset.touched='1'">
               <label for="grat1">We allow the customer to provide gratuity at their discretion</label>
             </div>
             <div class="checkbox-item">
-              <input type="radio" name="gratuity_type" id="grat2" value="automatic" onchange="handleGratuity()">
+              <input type="radio" name="gratuity_type" id="grat2" value="automatic" onchange="handleGratuity();this.dataset.touched='1'">
               <label for="grat2">We have automatic gratuities at the following rates</label>
             </div>
           </div>
@@ -1840,8 +1840,6 @@ function updateProgress() {
   let filled = 0;
   sections.forEach(id => {
     const card = document.getElementById(id);
-    // Exclude time inputs and selects from auto-fill detection —
-    // only text, email, tel, number, textarea count as "user filled"
     const textInputs = card.querySelectorAll(
       'input[type="text"], input[type="email"], input[type="tel"], input[type="number"], textarea'
     );
@@ -1849,9 +1847,12 @@ function updateProgress() {
     textInputs.forEach(inp => {
       if (inp.value && inp.value.trim() !== '') sectionFilled = true;
     });
-    // Checkboxes and radios only count if explicitly checked by user
-    const checks = card.querySelectorAll('input[type="checkbox"]:checked, input[type="radio"]:checked');
+    // Only count checkboxes (not radios) as implicit signals — radios require data-touched
+    const checks = card.querySelectorAll('input[type="checkbox"]:checked');
     if (checks.length > 0) sectionFilled = true;
+    // Radios only count if the user explicitly clicked one (data-touched set in onchange)
+    const touchedRadios = card.querySelectorAll('input[type="radio"][data-touched="1"]:checked');
+    if (touchedRadios.length > 0) sectionFilled = true;
     if (sectionFilled) filled++;
   });
   const pct = Math.round((filled / sections.length) * 100);
@@ -1867,8 +1868,10 @@ function updateProgress() {
     );
     let active = false;
     textInputs.forEach(inp => { if (inp.value && inp.value.trim() !== '') active = true; });
-    const checks = card.querySelectorAll('input[type="checkbox"]:checked, input[type="radio"]:checked');
+    const checks = card.querySelectorAll('input[type="checkbox"]:checked');
     if (checks.length > 0) active = true;
+    const touchedRadios = card.querySelectorAll('input[type="radio"][data-touched="1"]:checked');
+    if (touchedRadios.length > 0) active = true;
     return `<button type="button" class="progress-label ${active ? 'active' : ''}" onclick="jumpToSection('${sections[i]}')" aria-label="Jump to ${l} section">${l}</button>`;
   }).join('');
 }
