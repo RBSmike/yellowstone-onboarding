@@ -1,0 +1,1947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YellowStone PMS — Client Onboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     CSS VARIABLES — RBS / YELLOWSTONE BRAND (Light / ADA)
+     All text/bg combos meet WCAG AA (4.5:1) or AAA (7:1)
+  ============================================================ */
+  :root {
+    /* Warm off-white — premium, not clinical */
+    --color-bg:           #f5f3ef;
+    --color-surface:      #ffffff;
+    --color-surface-2:    #f9f8f6;
+    --color-border:       #e0dcd5;
+    --color-border-light: #cbc6bc;
+    /* YellowStone amber — darkened to #a86e10 for AA on white (5.1:1) */
+    --color-gold:         #a86e10;
+    --color-gold-light:   #c98c22;
+    --color-gold-dim:     rgba(168,110,16,0.10);
+    /* Text — near-black on light = AAA */
+    --color-text:         #1a1814;
+    --color-text-muted:   #4a4640;
+    --color-text-dim:     #7a7570;
+    --color-accent:       #2a6080;
+    --color-danger:       #b53a2a;
+    --color-success:      #2e6e38;
+    --font-display:       'Barlow Condensed', sans-serif;
+    --font-body:          'Barlow', sans-serif;
+    --radius:             5px;
+    --radius-lg:          10px;
+    --transition:         0.2s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* ============================================================ SKIP LINK (ADA) */
+  .skip-link {
+    position: absolute;
+    top: -100px;
+    left: 16px;
+    z-index: 9999;
+    padding: 10px 20px;
+    background: var(--color-gold);
+    color: #ffffff;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: var(--radius);
+    text-decoration: none;
+    transition: top 0.2s;
+  }
+  .skip-link:focus { top: 16px; }
+
+  /* ============================================================ RESET */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+
+  /* ============================================================ BACKGROUND TEXTURE */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 0% 0%, rgba(168,110,16,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 60% 60% at 100% 100%, rgba(42,96,128,0.05) 0%, transparent 55%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ============================================================ LAYOUT */
+  .page-wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 60px 24px 100px;
+  }
+
+  /* ============================================================ HEADER */
+  .page-header {
+    text-align: center;
+    margin-bottom: 56px;
+    padding: 32px 0 44px;
+    border-bottom: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-gold);
+    position: relative;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 1px 4px rgba(26,24,20,0.06), 0 4px 16px rgba(26,24,20,0.04);
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+  .page-header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--color-gold), transparent);
+  }
+
+  /* Dual logo bar — dark strip keeps white logos visible & on-brand */
+  .logo-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: -32px -32px 28px -32px;
+    padding: 18px 32px;
+    background: #1a1814;
+    border-radius: calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0 0;
+  }
+  .logo-rbs {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+    object-position: left center;
+  }
+  .logo-yellowstone {
+    height: 28px;
+    width: auto;
+    object-fit: contain;
+    object-position: right center;
+  }
+  .header-rule {
+    height: 1px;
+    background: var(--color-border);
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .header-rule::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -1px;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 2px;
+    background: var(--color-gold);
+  }
+
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    line-height: 1.1;
+    margin-bottom: 14px;
+  }
+  .page-header p {
+    color: var(--color-text-muted);
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* ============================================================ PROGRESS — STICKY */
+  .progress-sentinel { height: 0; }
+  .progress-bar-wrap {
+    margin-bottom: 32px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 16px 24px;
+    box-shadow: 0 1px 4px rgba(26,24,20,0.05);
+    position: relative;
+    z-index: 100;
+    transition: border-radius 0.2s, box-shadow 0.2s, padding 0.2s;
+  }
+  .progress-bar-wrap.is-sticky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-bottom: 2px solid var(--color-border);
+    padding: 11px calc((100vw - 832px) / 2);
+    box-shadow: 0 3px 20px rgba(26,24,20,0.12);
+    background: rgba(255,255,255,0.97);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .progress-placeholder {
+    display: none;
+    margin-bottom: 32px;
+  }
+  .progress-placeholder.active { display: block; }
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 2px;
+  }
+  .progress-label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-dim);
+    font-weight: 500;
+    transition: color var(--transition), background var(--transition);
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 3px;
+    border: none;
+    background: none;
+    font-family: var(--font-body);
+    text-decoration: none;
+  }
+  .progress-label:hover { color: var(--color-gold); background: var(--color-gold-dim); }
+  .progress-label:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 2px; }
+  .progress-label.active { color: var(--color-gold); font-weight: 700; }
+  .progress-label.active::after { content: ' ✓'; font-size: 9px; }
+  .progress-track {
+    height: 6px;
+    background: var(--color-border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-gold), var(--color-gold-light));
+    border-radius: 6px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+  .progress-pct {
+    text-align: right;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-top: 7px;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+  .section-card { scroll-margin-top: 100px; }
+  @media (max-width: 880px) {
+    .progress-bar-wrap.is-sticky { padding: 11px 16px; }
+  }
+
+  /* ============================================================ SECTION CARD */
+  .section-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: border-color var(--transition), box-shadow var(--transition);
+    box-shadow: 0 1px 4px rgba(26,24,20,0.06), 0 4px 16px rgba(26,24,20,0.04);
+  }
+  .section-card:hover {
+    border-color: var(--color-border-light);
+    box-shadow: 0 2px 8px rgba(26,24,20,0.08), 0 8px 24px rgba(26,24,20,0.06);
+  }
+  .section-card.active { border-color: rgba(168,110,16,0.35); }
+
+  .section-header {
+    padding: 24px 32px 20px;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    cursor: pointer;
+    user-select: none;
+    background: var(--color-surface);
+    transition: background var(--transition);
+  }
+  .section-header:hover { background: #faf9f7; }
+  .section-header-text {}
+  .section-header h2 {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    margin-bottom: 4px;
+  }
+  .section-header p {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    line-height: 1.55;
+    max-width: 560px;
+    font-weight: 400;
+  }
+  .section-toggle {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border-light);
+    background: var(--color-surface-2);
+    color: var(--color-text-muted);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition);
+    margin-top: 2px;
+  }
+  .section-toggle:hover { border-color: var(--color-gold); color: var(--color-gold); background: var(--color-gold-dim); }
+  .section-card.collapsed .section-toggle { transform: rotate(-90deg); }
+
+  .section-body {
+    padding: 28px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    background: var(--color-surface);
+  }
+  .section-card.collapsed .section-body { display: none; }
+
+  /* ============================================================ FIELD GROUP */
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .field-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+  }
+  .field-hint {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    font-style: italic;
+    margin-top: -4px;
+    margin-bottom: 2px;
+    font-weight: 400;
+  }
+
+  /* ============================================================ INPUTS */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="time"],
+  textarea,
+  select {
+    width: 100%;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 11px 14px;
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 400;
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+    appearance: none;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--color-gold);
+    box-shadow: 0 0 0 3px var(--color-gold-dim);
+    background: #ffffff;
+  }
+  input::placeholder, textarea::placeholder { color: var(--color-text-dim); }
+  textarea { resize: vertical; min-height: 100px; }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a4640' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  /* ============================================================ GRID COLUMNS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+
+  @media (max-width: 640px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .section-body { padding: 20px; }
+    .section-header { padding: 20px; }
+  }
+
+  /* ============================================================ DYNAMIC ROWS */
+  .dynamic-rows { display: flex; flex-direction: column; gap: 8px; }
+  .dynamic-row {
+    display: grid;
+    gap: 8px;
+    align-items: center;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    position: relative;
+    transition: border-color var(--transition);
+  }
+  .dynamic-row:hover { border-color: var(--color-border-light); }
+  .dynamic-row input, .dynamic-row select {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 0;
+    padding: 6px 4px;
+    font-size: 13px;
+    color: var(--color-text);
+    font-weight: 400;
+  }
+  .dynamic-row input::placeholder { color: var(--color-text-dim); }
+  .dynamic-row input:focus, .dynamic-row select:focus {
+    border-bottom-color: var(--color-gold);
+    box-shadow: none;
+    background: transparent;
+  }
+  .row-col-header {
+    display: grid;
+    gap: 8px;
+    padding: 0 12px;
+    margin-bottom: 2px;
+  }
+  .col-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+  .btn-remove-row {
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-light);
+    color: var(--color-text-muted);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+    z-index: 2;
+    box-shadow: 0 1px 3px rgba(26,24,20,0.1);
+  }
+  .btn-remove-row:hover { background: var(--color-danger); border-color: var(--color-danger); color: #fff; }
+
+  .btn-add-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 9px 18px;
+    background: var(--color-surface-2);
+    border: 1.5px dashed var(--color-border-light);
+    border-radius: var(--radius);
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all var(--transition);
+    align-self: flex-start;
+  }
+  .btn-add-row:hover {
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+    background: var(--color-gold-dim);
+  }
+  .btn-add-row::before { content: '+'; font-size: 15px; font-weight: 700; }
+
+  /* ============================================================ CHECKBOXES & RADIO */
+  .checkbox-group { display: flex; flex-direction: column; gap: 10px; }
+  .checkbox-item, .radio-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+  }
+  .checkbox-item input[type="checkbox"],
+  .radio-item input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border: 2px solid var(--color-border-light);
+    border-radius: 3px;
+    background: #ffffff;
+    appearance: none;
+    cursor: pointer;
+    margin-top: 2px;
+    transition: all var(--transition);
+    position: relative;
+  }
+  .radio-item input[type="radio"] { border-radius: 50%; }
+  .checkbox-item input[type="checkbox"]:checked,
+  .radio-item input[type="radio"]:checked {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+  }
+  .checkbox-item input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 4px; top: 2px;
+    width: 5px; height: 8px;
+    border: 2px solid #ffffff;
+    border-top: none; border-left: none;
+    transform: rotate(45deg);
+  }
+  .radio-item input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 3px; top: 3px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #ffffff;
+  }
+  .checkbox-item label, .radio-item label {
+    font-size: 14px;
+    color: var(--color-text);
+    cursor: pointer;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  /* ============================================================ COLLAPSIBLE ANSWER BOX */
+  .collapsible-answer {
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+    max-height: 600px;
+    opacity: 1;
+  }
+  .collapsible-answer.hidden { max-height: 0; opacity: 0; pointer-events: none; }
+
+  /* ============================================================ INLINE TOGGLE FIELD */
+  .toggle-field {
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: all var(--transition);
+  }
+  .toggle-field-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+  .toggle-field-header span {
+    font-size: 14px;
+    color: var(--color-text);
+    font-weight: 400;
+  }
+  .toggle-indicator {
+    width: 36px;
+    height: 20px;
+    border-radius: 10px;
+    background: var(--color-border-light);
+    position: relative;
+    transition: background var(--transition);
+    flex-shrink: 0;
+  }
+  .toggle-indicator::after {
+    content: '';
+    position: absolute;
+    left: 3px; top: 3px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    transition: all var(--transition);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  }
+  .toggle-field.enabled .toggle-indicator { background: var(--color-gold); }
+  .toggle-field.enabled .toggle-indicator::after { left: 19px; }
+  .toggle-field-body {
+    padding: 0 16px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.3s ease;
+  }
+  .toggle-field.enabled .toggle-field-body { max-height: 400px; padding: 0 16px 16px; }
+
+  /* ============================================================ FILE UPLOAD */
+  .file-upload-zone {
+    border: 2px dashed var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: 36px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition);
+    background: var(--color-surface-2);
+    position: relative;
+  }
+  .file-upload-zone:hover {
+    border-color: var(--color-gold);
+    background: var(--color-gold-dim);
+  }
+  .file-upload-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+  .file-upload-icon {
+    width: 40px; height: 40px;
+    margin: 0 auto 12px;
+    opacity: 0.5;
+    color: var(--color-gold);
+  }
+  .file-upload-zone p {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .file-upload-zone small {
+    font-size: 12px;
+    color: var(--color-text-dim);
+    letter-spacing: 0.06em;
+  }
+  .file-list { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .file-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--color-text);
+  }
+  .file-item span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-item button {
+    background: none; border: none; color: var(--color-text-dim);
+    cursor: pointer; font-size: 18px; line-height: 1;
+    transition: color var(--transition);
+  }
+  .file-item button:hover { color: var(--color-danger); }
+
+  /* ============================================================ DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 8px 0;
+  }
+
+  /* ============================================================ SUBSECTION */
+  .subsection {
+    background: rgba(245,243,239,0.7);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .subsection-title {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-dim);
+    margin-bottom: 4px;
+  }
+
+  /* ============================================================ DEPOSIT / TAX TOGGLES */
+  .opt-in-block {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .opt-in-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .opt-in-row input[type="checkbox"] {
+    width: 16px; height: 16px; min-width: 16px;
+    border: 2px solid var(--color-border-light);
+    border-radius: 3px;
+    background: #ffffff;
+    appearance: none;
+    cursor: pointer;
+    transition: all var(--transition);
+    position: relative;
+  }
+  .opt-in-row input[type="checkbox"]:checked {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+  }
+  .opt-in-row input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 4px; top: 1px;
+    width: 5px; height: 8px;
+    border: 2px solid #ffffff;
+    border-top: none; border-left: none;
+    transform: rotate(45deg);
+  }
+  .opt-in-row label { font-size: 14px; color: var(--color-text); cursor: pointer; font-weight: 400; }
+  .opt-in-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 12px;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: max-height 0.35s ease, opacity 0.3s ease, padding 0.3s ease;
+    max-height: 120px;
+    opacity: 1;
+  }
+  .opt-in-fields.hidden { max-height: 0; opacity: 0; padding: 0 12px; pointer-events: none; border: none; }
+
+  /* ============================================================ SUBMIT BUTTON */
+  .submit-section {
+    text-align: center;
+    margin-top: 48px;
+    padding-top: 48px;
+    border-top: 1px solid var(--color-border);
+  }
+  .submit-section p {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    font-weight: 400;
+    margin-bottom: 28px;
+    max-width: 460px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+  .btn-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 48px;
+    background: linear-gradient(135deg, var(--color-gold) 0%, #8a580c 100%);
+    border: none;
+    border-radius: var(--radius);
+    color: #ffffff;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: 0 4px 24px rgba(168,110,16,0.20);
+  }
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(168,110,16,0.30);
+  }
+  .btn-submit:active { transform: translateY(0); }
+
+  /* ============================================================ SUCCESS SCREEN */
+  #success-screen {
+    display: none;
+    text-align: center;
+    padding: 80px 24px;
+    animation: fadeIn 0.6s ease;
+  }
+  #success-screen.visible { display: block; }
+  .success-icon {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: rgba(46,110,56,0.10);
+    border: 2px solid var(--color-success);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 28px;
+    font-size: 32px;
+    color: var(--color-success);
+  }
+  #success-screen h2 {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    margin-bottom: 16px;
+  }
+  #success-screen p { color: var(--color-text-muted); font-size: 15px; line-height: 1.6; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ============================================================ SECTION NUMBER BADGE */
+  .section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--color-gold-dim);
+    border: 1px solid rgba(168,110,16,0.3);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--color-gold);
+    margin-right: 10px;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  /* ============================================================ EMAIL-BYPASS CHECKBOX */
+  .bypass-check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--color-gold-dim);
+    border: 1px solid rgba(168,110,16,0.2);
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+  .bypass-check input[type="checkbox"] {
+    width: 15px; height: 15px; min-width: 15px;
+    border: 1px solid rgba(168,110,16,0.5);
+    border-radius: 3px;
+    background: #ffffff;
+    appearance: none;
+    cursor: pointer;
+    position: relative;
+    transition: all var(--transition);
+  }
+  .bypass-check input[type="checkbox"]:checked {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+  }
+  .bypass-check input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 4px; top: 1px;
+    width: 5px; height: 8px;
+    border: 2px solid #ffffff;
+    border-top: none; border-left: none;
+    transform: rotate(45deg);
+  }
+  .bypass-check label {
+    font-size: 12px;
+    color: var(--color-gold);
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+  }
+
+  /* multiselect styling — reserved for future use */
+
+  /* ============================================================ MEAL PICKER */
+  .meal-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .meal-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+  }
+  .meal-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1.5px solid var(--color-border-light);
+    background: #fff;
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all var(--transition);
+    white-space: nowrap;
+  }
+  .meal-pill:hover {
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+    background: var(--color-gold-dim);
+  }
+  .meal-pill.selected {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+    color: #fff;
+  }
+  .meal-pill.selected:hover {
+    background: var(--color-gold-light);
+    border-color: var(--color-gold-light);
+    color: #fff;
+  }
+  .meal-pill-all.selected {
+    background: #2e6e38;
+    border-color: #2e6e38;
+  }
+  .meal-pill-all.selected:hover {
+    background: #3a8a47;
+    border-color: #3a8a47;
+  }
+  .meal-pill-none.selected {
+    background: var(--color-text-dim);
+    border-color: var(--color-text-dim);
+  }
+  .meal-pill:focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
+  }
+
+
+     All interactive elements get a clear 3px gold ring on keyboard focus.
+     Ensures WCAG 2.1 SC 2.4.7 (Focus Visible) compliance.
+  ============================================================ */
+  *:focus-visible {
+    outline: 3px solid var(--color-gold);
+    outline-offset: 2px;
+    border-radius: var(--radius);
+  }
+  button:focus-visible,
+  .section-toggle:focus-visible,
+  .btn-add-row:focus-visible,
+  .btn-submit:focus-visible {
+    outline: 3px solid var(--color-gold);
+    outline-offset: 3px;
+  }
+  /* Remove default outline since we handle it above */
+  *:focus:not(:focus-visible) { outline: none; }
+
+  /* ============================================================ ADA — MINIMUM TOUCH TARGETS
+     Buttons and checkboxes meet 44×44px minimum (WCAG 2.5.5)
+  ============================================================ */
+  .checkbox-item, .radio-item {
+    min-height: 44px;
+    align-items: center;
+  }
+  .btn-add-row { min-height: 40px; }
+  .btn-submit { min-height: 52px; }
+
+  /* ============================================================ FOOTER */
+  .page-footer {
+    margin-top: 56px;
+    padding-top: 28px;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-logos {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 10px 20px;
+    background: #1a1814;
+    border-radius: 6px;
+  }
+  .footer-logos img { height: 18px; width: auto; }
+  .footer-logos .logo-divider {
+    width: 1px; height: 16px;
+    background: rgba(255,255,255,0.18);
+  }
+  .footer-copy {
+    font-size: 12px;
+    color: var(--color-text-dim);
+    letter-spacing: 0.04em;
+  }
+  .footer-copy a {
+    color: var(--color-gold);
+    text-decoration: none;
+  }
+  .footer-copy a:hover { text-decoration: underline; }
+  .footer-copy a:focus-visible {
+    outline: 3px solid var(--color-gold);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+<a href="#mainForm" class="skip-link">Skip to main content</a>
+
+<div class="page-wrapper">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <!-- Dual logo bar -->
+    <div class="logo-bar">
+      <img src="https://rbsgo.com/wp-content/uploads/2025/06/RBS-white-web.png"
+           alt="RBS" class="logo-rbs">
+      <img src="https://rbsgo.com/wp-content/uploads/2025/05/YellowStone-Logo-Original-dark-background-scaled.png"
+           alt="YellowStone PMS" class="logo-yellowstone">
+    </div>
+    <div class="header-rule"></div>
+    <h1>Client Onboarding</h1>
+    <p>Complete the form below to begin your YellowStone implementation. Your Implementation Manager will review your submission and be in touch within 1–2 business days.</p>
+  </header>
+
+  <!-- PROGRESS -->
+  <div class="progress-sentinel" id="progressSentinel"></div>
+  <div class="progress-placeholder" id="progressPlaceholder"></div>
+  <div class="progress-bar-wrap" id="progressBar">
+    <div class="progress-labels" id="progressLabels"></div>
+    <div class="progress-track" role="progressbar" aria-label="Form completion progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="progressTrack"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-pct" id="progressPct">0% complete</div>
+  </div>
+
+  <!-- FORM -->
+  <main>
+  <form id="mainForm" novalidate aria-label="YellowStone Client Onboarding Form">
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 1 — YELLOWSTONE USERS
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card active" id="sec-users" role="region" aria-labelledby="hd-users">
+      <div class="section-header" onclick="toggleSection('sec-users')" role="button" tabindex="0" aria-expanded="true" aria-controls="body-users" onkeydown="if(event.key==='Enter'||event.key===' ')toggleSection('sec-users')">
+        <div class="section-header-text">
+          <h2 id="hd-users">Yellowstone Users</h2>
+          <p>All users will be admins by default. Your implementation manager will advise you on how to adjust user permissions in future meetings.</p>
+        </div>
+        <button type="button" class="section-toggle">▾</button>
+      </div>
+      <div class="section-body">
+        <div class="field-group">
+          <span class="field-label">Users</span>
+          <div class="row-col-header grid-3" id="usersColHeader">
+            <span class="col-label">First Name</span>
+            <span class="col-label">Last Name</span>
+            <span class="col-label">Email Address</span>
+          </div>
+          <div class="dynamic-rows" id="usersRows"></div>
+          <button type="button" class="btn-add-row" onclick="addRow('usersRows', userRowTemplate)">Add User</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 2 — BUSINESS INFORMATION
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="sec-biz">
+      <div class="section-header" onclick="toggleSection('sec-biz')">
+        <div class="section-header-text">
+          <h2>Business Information</h2>
+          <p>This information will be present on your invoices sent from Yellowstone.</p>
+        </div>
+        <button type="button" class="section-toggle">▾</button>
+      </div>
+      <div class="section-body">
+
+        <div class="field-group">
+          <label class="field-label">Correspondence Email</label>
+          <p class="field-hint">The email address all correspondence from Yellowstone will send from.</p>
+          <input type="email" name="biz_email" placeholder="e.g. hello@yourproperty.com">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Business Physical Address</label>
+          <div class="grid-2">
+            <input type="text" name="biz_address" placeholder="Street Address" style="grid-column:1/-1">
+          </div>
+          <div class="grid-3" style="margin-top:8px">
+            <input type="text" name="biz_city" placeholder="City">
+            <input type="text" name="biz_state" placeholder="State">
+            <input type="text" name="biz_zip" placeholder="ZIP Code">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Business Phone Number</label>
+          <input type="tel" name="biz_phone" placeholder="(555) 000-0000" style="max-width:260px">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 3 — BUSINESS EMAIL TEMPLATES
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="sec-emails">
+      <div class="section-header" onclick="toggleSection('sec-emails')">
+        <div class="section-header-text">
+          <h2>Business Email Templates</h2>
+        </div>
+        <button type="button" class="section-toggle">▾</button>
+      </div>
+      <div class="section-body">
+
+        <div class="field-group">
+          <span class="field-label">Standardized Customer Emails</span>
+          <p class="field-hint">Do you send standardized emails to your customers? If so, you may provide copies below, or send them via email to your Implementation Manager.</p>
+
+          <div class="checkbox-group" style="margin-bottom:12px">
+            <div class="checkbox-item">
+              <input type="checkbox" id="emailBypass1" onchange="handleEmailBypass()">
+              <label for="emailBypass1">I will email this information to my Implementation Manager</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="emailBypass2" onchange="handleEmailBypass()">
+              <label for="emailBypass2">We do not have standardized emails</label>
+            </div>
+          </div>
+
+          <div class="collapsible-answer" id="emailTemplatesBox">
+            <textarea name="email_templates" rows="5" placeholder="Paste your email templates here, or describe them…"></textarea>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 4 — RESERVATION TYPES
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="sec-reservations">
+      <div class="section-header" onclick="toggleSection('sec-reservations')">
+        <div class="section-header-text">
+          <h2>Reservation Types</h2>
+        </div>
+        <button type="button" class="section-toggle">▾</button>
+      </div>
+      <div class="section-body">
+
+        <div class="field-group">
+          <span class="field-label">Reservation Types</span>
+          <p class="field-hint">Examples: Bird Hunt, Clay Shoot, Corporate Outing, Lodging, Deer Hunt</p>
+          <div class="row-col-header" id="resColHeader" style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1.4fr;gap:8px;padding:0 12px">
+            <span class="col-label">Reservation Type</span>
+            <span class="col-label">Check-In Time</span>
+            <span class="col-label">Check-Out Time</span>
+            <span class="col-label">Default Nights</span>
+            <span class="col-label">Included Meals</span>
+          </div>
+          <div class="dynamic-rows" id="reservationRows"></div>
+          <button type="button" class="btn-add-row" onclick="addRow('reservationRows', reservationRowTemplate)">Add Reservation Type</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 5 — ACTIVITIES
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="sec-activities">
+      <div class="section-header" onclick="toggleSection('sec-activities')">
+        <div class="section-header-text">
+          <h2>Activities</h2>
+          <p>Activities are anything you'd want to track on your activity calendar. You may assign guides, locations, resources, and guests to these activities.</p>
+        </div>
+        <button type="button" class="section-toggle">▾</button>
+      </div>
+      <div class="section-body">
+
+        <div class="field-group">
+          <span class="field-label">Activities &amp; Times</span>
+          <div class="row-col-header" style="display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:8px;padding:0 12px">
+            <span class="col-label">Activity Name</span>
+            <span class="col-label">Start Time</span>
+            <span class="col-label">End Time</span>
+          </div>
+          <div class="dynamic-rows" id="activityRows"></div>
+          <button type="button" class="btn-add-row" onclick="addRow('activityRows', activityRowTemplate)">Add Activity</button>
+        </div>
+
+        <div class="field-group">
+          <span class="field-label">Activity Locations</span>
+          <p class="field-hint">List all locations on your property where activities can take place.</p>
+          <div class="dynamic-rows" id="activityLocationRows"></div>
+          <button type="button" class="btn-add-row" onclick="addRow('activityLocationRows', singleRowTemplate('Location Name', 'act_loc'))">Add Location</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 6 — LODGING AND ROOMS
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="sec-lodging">
+      <div class="section-header" onclick="toggleSection('sec-lodging')">
+        <div class="section-header-text">
+          <h2>Lodging &amp; Rooms</h2>
+        </div>
+        <button type="button" class="section-toggle">▾</button>
+      </div>
+      <div class="section-body">
+
+        <div class="field-group">
+          <span class="field-label">Lodging Locations</span>
+          <p class="field-hint">List all locations where guests may be lodged on your property.</p>
+          <div class="dynamic-rows" id="lodgingLocationRows"></div>
+          <button type="button" class="btn-add-row" onclick="addRow('lodgingLocationRows', singleRowTemplate('Lodging Location', 'lodge_loc'))">Add Location</button>
+        </div>
+
+        <div class="field-group">
+          <span class="field-label">Rooms</span>
+          <p class="field-hint">For each location, list the rooms available, their capacity, and room type.</p>
+          <div class="row-col-header" style="display:grid;grid-template-columns:1.2fr 1.2fr 0.6fr 1.4fr;gap:8px;padding:0 12px">
+            <span class="col-label">Location</span>
+            <span class="col-label">Room Name</span>
+            <span class="col-label">Capacity</span>
+            <span class="col-label">Room Type</span>
+          </div>
+          <div class="dynamic-rows" id="roomRows"></div>
+          <button type="button" class="btn-add-row" onclick="addRow('roomRows', roomRowTemplate)">Add Room</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 7 — PRICING AND RATES
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="sec-pricing">
+      <div class="section-header" onclick="toggleSection('sec-pricing')">
+        <div class="section-header-text">
+          <h2>Pricing &amp; Rates</h2>
+        </div>
+        <button type="button" class="section-toggle">▾</button>
+      </div>
+      <div class="section-body">
+
+        <!-- DEPOSIT STRUCTURE -->
+        <div class="field-group">
+          <span class="field-label">Deposit Structure</span>
+          <p class="field-hint">Example: Deposit 1 = 50%, Deposit 2 = 50%</p>
+
+          <div class="bypass-check" style="margin-bottom:10px">
+            <input type="checkbox" id="noDeposits" onchange="toggle('noDeposits','depositContent')">
+            <label for="noDeposits">We do not currently take deposits</label>
+          </div>
+
+          <div class="collapsible-answer" id="depositContent">
+            <div id="depositBlocks" style="display:flex;flex-direction:column;gap:8px"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+              <button type="button" class="btn-add-row" onclick="addDepositBlock()">Add Deposit</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- TAX RATES -->
+        <div class="field-group">
+          <span class="field-label">Tax Rates</span>
+          <div id="taxBlocks" style="display:flex;flex-direction:column;gap:8px"></div>
+          <button type="button" class="btn-add-row" onclick="addTaxBlock()">Add Tax Rate</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- GRATUITY -->
+        <div class="field-group">
+          <span class="field-label">Gratuity</span>
+          <div class="checkbox-group" id="gratuityOptions">
+            <div class="checkbox-item">
+              <input type="radio" name="gratuity_type" id="grat0" value="none" onchange="handleGratuity()" checked>
+              <label for="grat0">We do not currently take gratuities</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="radio" name="gratuity_type" id="grat1" value="discretion" onchange="handleGratuity()">
+              <label for="grat1">We allow the customer to provide gratuity at their discretion</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="radio" name="gratuity_type" id="grat2" value="automatic" onchange="handleGratuity()">
+              <label for="grat2">We have automatic gratuities at the following rates</label>
+            </div>
+          </div>
+          <div class="collapsible-answer hidden" id="gratuityFields" style="margin-top:10px">
+            <div class="grid-2">
+              <div class="field-group"><label class="field-label" style="font-size:10px">Gratuity Label</label><input type="text" name="grat_label" placeholder="e.g. Service Charge"></div>
+              <div class="field-group"><label class="field-label" style="font-size:10px">Rate (%)</label><input type="number" name="grat_value" placeholder="e.g. 18" min="0" max="100"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- RATES LIST -->
+        <div class="field-group">
+          <span class="field-label">Property Rates</span>
+          <p class="field-hint">Examples: Trophy Deer $10,000 · Range Fee $25 · Gun Rental $50 · Lodging $250/night</p>
+
+          <div class="bypass-check" style="margin-bottom:10px">
+            <input type="checkbox" id="bypassRates" onchange="toggle('bypassRates','ratesContent')">
+            <label for="bypassRates">I will email this information to my Implementation Manager</label>
+          </div>
+
+          <div class="collapsible-answer" id="ratesContent">
+            <div class="row-col-header grid-2" style="padding:0 12px">
+              <span class="col-label">Rate / Item Name</span>
+              <span class="col-label">Price</span>
+            </div>
+            <div class="dynamic-rows" id="ratesRows"></div>
+            <button type="button" class="btn-add-row" onclick="addRow('ratesRows', rateRowTemplate)">Add Rate</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- CANCELLATION POLICY -->
+        <div class="field-group">
+          <span class="field-label">Cancellation Policy &amp; Fee</span>
+
+          <div class="bypass-check" style="margin-bottom:10px">
+            <input type="checkbox" id="noCancellation" onchange="toggle('noCancellation','cancellationContent')">
+            <label for="noCancellation">We do not currently have a cancellation policy</label>
+          </div>
+
+          <div class="collapsible-answer" id="cancellationContent">
+            <textarea name="cancellation_policy" rows="4" placeholder="Describe your cancellation policy and associated fees…"></textarea>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- REFUND / CREDIT -->
+        <div class="field-group">
+          <span class="field-label">Cancellation Refund Policy</span>
+          <p class="field-hint">When a customer cancels, how do you handle their funds?</p>
+          <div class="checkbox-group" id="refundOptions">
+            <div class="radio-item">
+              <input type="radio" name="refund_type" id="ref1" value="refund_minus_fee">
+              <label for="ref1">We refund the deposit, minus the cancellation fee</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" name="refund_type" id="ref2" value="full_refund">
+              <label for="ref2">We refund the full amount</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" name="refund_type" id="ref3" value="credit">
+              <label for="ref3">We retain the funds as a credit for future reservations</label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 8 — MEMBERSHIPS
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="sec-memberships">
+      <div class="section-header" onclick="toggleSection('sec-memberships')">
+        <div class="section-header-text">
+          <h2>Memberships</h2>
+        </div>
+        <button type="button" class="section-toggle">▾</button>
+      </div>
+      <div class="section-body">
+        <div class="bypass-check">
+          <input type="checkbox" id="noMemberships" onchange="toggle('noMemberships','membershipsContent')">
+          <label for="noMemberships">We do not currently provide memberships</label>
+        </div>
+
+        <div class="collapsible-answer" id="membershipsContent">
+          <div class="field-group" style="margin-top:4px">
+            <span class="field-label">Membership Tiers</span>
+            <div class="row-col-header" style="display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:8px;padding:0 12px">
+              <span class="col-label">Membership Name</span>
+              <span class="col-label">Fee ($)</span>
+              <span class="col-label">Renewal Frequency</span>
+            </div>
+            <div class="dynamic-rows" id="membershipRows"></div>
+            <button type="button" class="btn-add-row" onclick="addRow('membershipRows', membershipRowTemplate)">Add Membership</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 9 — GUIDES AND EMPLOYEES
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="sec-guides">
+      <div class="section-header" onclick="toggleSection('sec-guides')">
+        <div class="section-header-text">
+          <h2>Guides &amp; Employees</h2>
+          <p>Yellowstone allows you to assign guides or employees to activities, track working hours, and manage tasks.</p>
+        </div>
+        <button type="button" class="section-toggle">▾</button>
+      </div>
+      <div class="section-body">
+        <div class="field-group">
+          <span class="field-label">Staff Directory</span>
+          <div class="row-col-header" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1.5fr;gap:8px;padding:0 12px">
+            <span class="col-label">First Name</span>
+            <span class="col-label">Last Name</span>
+            <span class="col-label">Title</span>
+            <span class="col-label">Phone</span>
+            <span class="col-label">Email</span>
+          </div>
+          <div class="dynamic-rows" id="staffRows"></div>
+          <button type="button" class="btn-add-row" onclick="addRow('staffRows', staffRowTemplate)">Add Employee / Guide</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 10 — GUESTS
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="sec-guests">
+      <div class="section-header" onclick="toggleSection('sec-guests')">
+        <div class="section-header-text">
+          <h2>Guests</h2>
+        </div>
+        <button type="button" class="section-toggle">▾</button>
+      </div>
+      <div class="section-body">
+
+        <div class="bypass-check">
+          <input type="checkbox" id="noGuests" onchange="toggle('noGuests','guestsContent')">
+          <label for="noGuests">We do not currently have an existing guest list</label>
+        </div>
+
+        <div class="collapsible-answer" id="guestsContent">
+          <div class="field-group" style="margin-top:8px">
+            <span class="field-label">Upload Guest CSV</span>
+            <p class="field-hint">Please ensure your file contains at minimum: First Name, Last Name, Street Address, City, State, ZIP Code, Phone Number, Email</p>
+            <div class="file-upload-zone" onclick="document.getElementById('guestCsvInput').click()">
+              <input type="file" id="guestCsvInput" accept=".csv,.xlsx,.xls" onchange="handleFileUpload(event,'guestFileList')" style="display:none">
+              <svg class="file-upload-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2">
+                <rect x="6" y="4" width="28" height="32" rx="3"/>
+                <path d="M13 16h14M13 22h10M20 10v8M17 8l3-3 3 3"/>
+              </svg>
+              <p>Click to upload or drag &amp; drop</p>
+              <small>CSV, XLS, XLSX accepted</small>
+            </div>
+            <div class="file-list" id="guestFileList"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SECTION 11 — NOTES
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="section-card" id="sec-notes" role="region" aria-labelledby="hd-notes">
+      <div class="section-header" onclick="toggleSection('sec-notes')" role="button" tabindex="0" aria-expanded="true" aria-controls="body-notes" onkeydown="if(event.key==='Enter'||event.key===' ')toggleSection('sec-notes')">
+        <div class="section-header-text">
+          <h2 id="hd-notes">Notes &amp; Additional Comments</h2>
+          <p>Use this space to share anything that doesn't fit the sections above — special workflows, unique property details, questions for your Implementation Manager, or anything else you'd like us to know before we get started.</p>
+        </div>
+        <button type="button" class="section-toggle" aria-label="Toggle Notes section">▾</button>
+      </div>
+      <div class="section-body" id="body-notes">
+        <div class="field-group">
+          <label class="field-label" for="notes_general">General Notes</label>
+          <textarea id="notes_general" name="notes_general" rows="6" placeholder="Add any additional comments, questions, or information here…"></textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="notes_questions">Questions for Your Implementation Manager</label>
+          <textarea id="notes_questions" name="notes_questions" rows="4" placeholder="List any questions you'd like addressed during your first implementation meeting…"></textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="notes_preferred_contact">Preferred Contact Method</label>
+          <p class="field-hint">How would you prefer your Implementation Manager to reach out to you?</p>
+          <div class="checkbox-group">
+            <div class="radio-item">
+              <input type="radio" name="preferred_contact" id="contact_email" value="email" onchange="handleContactMethod()">
+              <label for="contact_email">Email</label>
+            </div>
+            <div class="collapsible-answer hidden" id="contact_email_field" style="margin-left:30px;margin-top:4px;margin-bottom:4px">
+              <input type="email" name="contact_email_value" id="contact_email_value" placeholder="Enter your preferred email address" autocomplete="email">
+            </div>
+            <div class="radio-item">
+              <input type="radio" name="preferred_contact" id="contact_phone" value="phone" onchange="handleContactMethod()">
+              <label for="contact_phone">Phone Call</label>
+            </div>
+            <div class="collapsible-answer hidden" id="contact_phone_field" style="margin-left:30px;margin-top:4px;margin-bottom:4px">
+              <input type="tel" name="contact_phone_value" id="contact_phone_value" placeholder="Enter your preferred phone number" autocomplete="tel">
+            </div>
+            <div class="radio-item">
+              <input type="radio" name="preferred_contact" id="contact_video" value="video" onchange="handleContactMethod()">
+              <label for="contact_video">Video Call</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" name="preferred_contact" id="contact_any" value="any" onchange="handleContactMethod()">
+              <label for="contact_any">No preference</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBMIT -->
+    <div class="submit-section">
+      <p>By submitting, you confirm that all information provided is accurate. Your Implementation Manager will reach out within 1–2 business days.</p>
+      <button type="submit" class="btn-submit" onclick="submitForm()" aria-label="Submit onboarding information to your Implementation Manager">
+        <span>Submit Onboarding Information</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </button>
+    </div>
+
+  </form>
+  </main>
+
+  <!-- SUCCESS -->
+  <div id="success-screen" role="alert" aria-live="polite">
+    <div class="success-icon" aria-hidden="true">✓</div>
+    <h2>Submission Received</h2>
+    <p style="margin-bottom:8px">Thank you for completing your YellowStone onboarding information.</p>
+    <p>Your Implementation Manager will be in touch within 1–2 business days to schedule your next steps.</p>
+    <div style="margin-top:40px;padding:16px 32px;background:#1a1814;border-radius:8px;display:inline-flex;align-items:center;gap:28px;">
+      <img src="https://rbsgo.com/wp-content/uploads/2025/06/RBS-white-web.png" alt="RBS" style="height:22px;width:auto">
+      <div style="width:1px;height:20px;background:rgba(255,255,255,0.15)"></div>
+      <img src="https://rbsgo.com/wp-content/uploads/2025/05/YellowStone-Logo-Original-dark-background-scaled.png" alt="YellowStone PMS" style="height:18px;width:auto">
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="page-footer" role="contentinfo">
+    <div class="footer-logos">
+      <img src="https://rbsgo.com/wp-content/uploads/2025/06/RBS-white-web.png" alt="RBS">
+      <div class="logo-divider" aria-hidden="true"></div>
+      <img src="https://rbsgo.com/wp-content/uploads/2025/05/YellowStone-Logo-Original-dark-background-scaled.png" alt="YellowStone PMS">
+    </div>
+    <p class="footer-copy">
+      © 2026 RB Software, Inc. &nbsp;·&nbsp;
+      <a href="https://rbsgo.com/?page_id=220" target="_blank" rel="noopener">Privacy Policy</a> &nbsp;·&nbsp;
+      <a href="https://rbsgo.com/?page_id=164" target="_blank" rel="noopener">Contact Us</a>
+    </p>
+  </footer>
+
+</div><!-- /page-wrapper -->
+
+<script>
+/* ================================================================
+   ROW TEMPLATES
+================================================================ */
+const userRowTemplate = () => `
+  <div class="dynamic-row" style="grid-template-columns:1fr 1fr 1fr">
+    <input type="text" placeholder="First Name">
+    <input type="text" placeholder="Last Name">
+    <input type="email" placeholder="Email Address">
+    <button type="button" class="btn-remove-row" onclick="removeRow(this)">×</button>
+  </div>`;
+
+const reservationRowTemplate = () => {
+  const uid = 'meals_' + Math.random().toString(36).slice(2,7);
+  return `
+  <div class="dynamic-row" style="grid-template-columns:1.5fr 1fr 1fr 1fr 1.6fr; align-items:start; padding-top:14px; padding-bottom:14px">
+    <input type="text" placeholder="Type Name">
+    <input type="time">
+    <input type="time">
+    <input type="number" placeholder="Nights" min="0">
+    <div class="meal-picker" id="${uid}">
+      <div class="meal-pills">
+        <button type="button" class="meal-pill" data-val="breakfast" onclick="toggleMeal(this,'${uid}')">Breakfast</button>
+        <button type="button" class="meal-pill" data-val="lunch"     onclick="toggleMeal(this,'${uid}')">Lunch</button>
+        <button type="button" class="meal-pill" data-val="dinner"    onclick="toggleMeal(this,'${uid}')">Dinner</button>
+        <button type="button" class="meal-pill meal-pill-all" data-val="all" onclick="toggleMeal(this,'${uid}')">All</button>
+        <button type="button" class="meal-pill meal-pill-none" data-val="none" onclick="toggleMeal(this,'${uid}')">None</button>
+      </div>
+      <input type="hidden" name="meals" class="meal-value">
+    </div>
+    <button type="button" class="btn-remove-row" onclick="removeRow(this)">×</button>
+  </div>`;
+};
+
+const activityRowTemplate = () => `
+  <div class="dynamic-row" style="grid-template-columns:1.5fr 1fr 1fr">
+    <input type="text" placeholder="Activity Name">
+    <input type="time">
+    <input type="time">
+    <button type="button" class="btn-remove-row" onclick="removeRow(this)">×</button>
+  </div>`;
+
+const singleRowTemplate = (ph, name) => () => `
+  <div class="dynamic-row" style="grid-template-columns:1fr">
+    <input type="text" name="${name}" placeholder="${ph}">
+    <button type="button" class="btn-remove-row" onclick="removeRow(this)">×</button>
+  </div>`;
+
+const roomRowTemplate = () => `
+  <div class="dynamic-row" style="grid-template-columns:1.2fr 1.2fr 0.6fr 1.4fr">
+    <input type="text" placeholder="Location Name">
+    <input type="text" placeholder="Room Name">
+    <input type="number" placeholder="Cap." min="1">
+    <input type="text" placeholder="e.g. 2 Queens, 1 King">
+    <button type="button" class="btn-remove-row" onclick="removeRow(this)">×</button>
+  </div>`;
+
+const membershipRowTemplate = () => `
+  <div class="dynamic-row" style="grid-template-columns:1.5fr 1fr 1fr">
+    <input type="text" placeholder="Membership Name">
+    <input type="number" placeholder="Fee ($)" min="0">
+    <select>
+      <option value="">Frequency…</option>
+      <option>Monthly</option>
+      <option>Annually</option>
+      <option>Lifetime</option>
+      <option>Other</option>
+    </select>
+    <button type="button" class="btn-remove-row" onclick="removeRow(this)">×</button>
+  </div>`;
+
+const staffRowTemplate = () => `
+  <div class="dynamic-row" style="grid-template-columns:1fr 1fr 1fr 1fr 1.5fr">
+    <input type="text" placeholder="First Name">
+    <input type="text" placeholder="Last Name">
+    <input type="text" placeholder="Title">
+    <input type="tel" placeholder="Phone">
+    <input type="email" placeholder="Email">
+    <button type="button" class="btn-remove-row" onclick="removeRow(this)">×</button>
+  </div>`;
+
+const rateRowTemplate = () => `
+  <div class="dynamic-row" style="grid-template-columns:1fr 1fr">
+    <input type="text" placeholder="Rate / Item Name">
+    <input type="text" placeholder="Price (e.g. $250 per night)">
+    <button type="button" class="btn-remove-row" onclick="removeRow(this)">×</button>
+  </div>`;
+
+/* ================================================================
+   ROW MANAGEMENT
+================================================================ */
+function addRow(containerId, template) {
+  const container = document.getElementById(containerId);
+  const div = document.createElement('div');
+  div.innerHTML = template();
+  container.appendChild(div.firstElementChild);
+  updateProgress();
+}
+
+function removeRow(btn) {
+  btn.closest('.dynamic-row').remove();
+  updateProgress();
+}
+
+/* ================================================================
+   SECTION TOGGLE
+================================================================ */
+function toggleSection(id) {
+  const card = document.getElementById(id);
+  card.classList.toggle('collapsed');
+}
+
+/* ================================================================
+   COLLAPSIBLE ANSWER BOXES
+================================================================ */
+function toggle(checkboxId, targetId) {
+  const cb = document.getElementById(checkboxId);
+  const box = document.getElementById(targetId);
+  if (cb.checked) { box.classList.add('hidden'); }
+  else { box.classList.remove('hidden'); }
+  updateProgress();
+}
+
+/* ================================================================
+   EMAIL TEMPLATES BYPASS
+================================================================ */
+function handleEmailBypass() {
+  const b1 = document.getElementById('emailBypass1').checked;
+  const b2 = document.getElementById('emailBypass2').checked;
+  const box = document.getElementById('emailTemplatesBox');
+  if (b1 || b2) box.classList.add('hidden');
+  else box.classList.remove('hidden');
+  updateProgress();
+}
+
+/* ================================================================
+   MEAL PICKER
+================================================================ */
+function toggleMeal(btn, uid) {
+  const picker = document.getElementById(uid);
+  const val = btn.dataset.val;
+  const allPills = picker.querySelectorAll('.meal-pill');
+
+  if (val === 'all') {
+    // Select all individual meals, deselect none
+    allPills.forEach(p => {
+      if (p.dataset.val === 'none') p.classList.remove('selected');
+      else p.classList.add('selected');
+    });
+  } else if (val === 'none') {
+    // Deselect everything else
+    allPills.forEach(p => p.classList.remove('selected'));
+    btn.classList.add('selected');
+  } else {
+    // Toggle this pill
+    btn.classList.toggle('selected');
+    // If none was selected, deselect it
+    picker.querySelector('[data-val="none"]').classList.remove('selected');
+    // Check if all 3 meals are now selected — auto-select "All"
+    const mealVals = ['breakfast','lunch','dinner'];
+    const allSelected = mealVals.every(v => picker.querySelector(`[data-val="${v}"]`).classList.contains('selected'));
+    picker.querySelector('[data-val="all"]').classList.toggle('selected', allSelected);
+  }
+
+  // Update hidden input value
+  const selected = [...picker.querySelectorAll('.meal-pill.selected')].map(p => p.dataset.val);
+  picker.querySelector('.meal-value').value = selected.join(',');
+  updateProgress();
+}
+
+/* ================================================================
+   CONTACT METHOD
+================================================================ */
+function handleContactMethod() {
+  const val = document.querySelector('input[name="preferred_contact"]:checked')?.value;
+
+  const emailField = document.getElementById('contact_email_field');
+  const phoneField = document.getElementById('contact_phone_field');
+  const emailInput = document.getElementById('contact_email_value');
+  const phoneInput = document.getElementById('contact_phone_value');
+
+  if (val === 'email') {
+    emailField.classList.remove('hidden');
+    phoneField.classList.add('hidden');
+    phoneInput.value = '';
+    setTimeout(() => emailInput.focus(), 50);
+  } else if (val === 'phone') {
+    phoneField.classList.remove('hidden');
+    emailField.classList.add('hidden');
+    emailInput.value = '';
+    setTimeout(() => phoneInput.focus(), 50);
+  } else {
+    emailField.classList.add('hidden');
+    phoneField.classList.add('hidden');
+    emailInput.value = '';
+    phoneInput.value = '';
+  }
+  updateProgress();
+}
+
+/* ================================================================
+   GRATUITY
+================================================================ */
+function handleGratuity() {
+  const val = document.querySelector('input[name="gratuity_type"]:checked')?.value;
+  const fields = document.getElementById('gratuityFields');
+  if (val === 'automatic') fields.classList.remove('hidden');
+  else fields.classList.add('hidden');
+}
+
+/* ================================================================
+   DEPOSITS
+================================================================ */
+let depositCount = 0;
+function addDepositBlock() {
+  if (depositCount >= 3) return;
+  depositCount++;
+  const n = depositCount;
+  const container = document.getElementById('depositBlocks');
+  const div = document.createElement('div');
+  div.id = `deposit-block-${n}`;
+  div.innerHTML = `
+    <div class="opt-in-row">
+      <input type="checkbox" id="dep${n}Check" onchange="toggleOptIn('dep${n}Check','dep${n}Fields')">
+      <label for="dep${n}Check">Deposit ${n}</label>
+    </div>
+    <div class="opt-in-fields hidden" id="dep${n}Fields">
+      <div class="field-group"><label class="field-label" style="font-size:10px">Label</label><input type="text" placeholder="e.g. Initial Deposit"></div>
+      <div class="field-group"><label class="field-label" style="font-size:10px">Value (%)</label><input type="number" placeholder="e.g. 50" min="0" max="100"></div>
+    </div>`;
+  container.appendChild(div);
+}
+
+/* ================================================================
+   TAX RATES
+================================================================ */
+let taxCount = 0;
+function addTaxBlock() {
+  if (taxCount >= 3) return;
+  taxCount++;
+  const n = taxCount;
+  const container = document.getElementById('taxBlocks');
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div class="opt-in-row">
+      <input type="checkbox" id="tax${n}Check" onchange="toggleOptIn('tax${n}Check','tax${n}Fields')">
+      <label for="tax${n}Check">Tax Rate ${n}</label>
+    </div>
+    <div class="opt-in-fields hidden" id="tax${n}Fields">
+      <div class="field-group"><label class="field-label" style="font-size:10px">Label</label><input type="text" placeholder="e.g. State Sales Tax"></div>
+      <div class="field-group"><label class="field-label" style="font-size:10px">Rate (%)</label><input type="number" placeholder="e.g. 8.25" min="0" max="100" step="0.01"></div>
+    </div>`;
+  container.appendChild(div);
+}
+
+function toggleOptIn(checkId, fieldsId) {
+  const cb = document.getElementById(checkId);
+  const fields = document.getElementById(fieldsId);
+  if (cb.checked) fields.classList.remove('hidden');
+  else fields.classList.add('hidden');
+}
+
+/* ================================================================
+   FILE UPLOAD
+================================================================ */
+function handleFileUpload(event, listId) {
+  const files = Array.from(event.target.files);
+  const list = document.getElementById(listId);
+  files.forEach(file => {
+    const item = document.createElement('div');
+    item.className = 'file-item';
+    item.innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#a86e10" stroke-width="1.5"><rect x="2" y="1" width="10" height="12" rx="1.5"/><path d="M5 5h4M5 7.5h4M5 10h2"/></svg>
+      <span>${file.name}</span>
+      <button type="button" onclick="this.parentElement.remove()">×</button>`;
+    list.appendChild(item);
+  });
+  updateProgress();
+}
+
+/* ================================================================
+   PROGRESS
+================================================================ */
+const sections = ['sec-users','sec-biz','sec-emails','sec-reservations','sec-activities','sec-lodging','sec-pricing','sec-memberships','sec-guides','sec-guests','sec-notes'];
+const sectionLabels = ['Users','Business','Emails','Reservations','Activities','Lodging','Pricing','Memberships','Guides','Guests','Notes'];
+
+function updateProgress() {
+  let filled = 0;
+  sections.forEach(id => {
+    const card = document.getElementById(id);
+    // Exclude time inputs and selects from auto-fill detection —
+    // only text, email, tel, number, textarea count as "user filled"
+    const textInputs = card.querySelectorAll(
+      'input[type="text"], input[type="email"], input[type="tel"], input[type="number"], textarea'
+    );
+    let sectionFilled = false;
+    textInputs.forEach(inp => {
+      if (inp.value && inp.value.trim() !== '') sectionFilled = true;
+    });
+    // Checkboxes and radios only count if explicitly checked by user
+    const checks = card.querySelectorAll('input[type="checkbox"]:checked, input[type="radio"]:checked');
+    if (checks.length > 0) sectionFilled = true;
+    if (sectionFilled) filled++;
+  });
+  const pct = Math.round((filled / sections.length) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '% complete';
+  document.getElementById('progressTrack').setAttribute('aria-valuenow', pct);
+
+  const labelsEl = document.getElementById('progressLabels');
+  labelsEl.innerHTML = sectionLabels.map((l, i) => {
+    const card = document.getElementById(sections[i]);
+    const textInputs = card.querySelectorAll(
+      'input[type="text"], input[type="email"], input[type="tel"], input[type="number"], textarea'
+    );
+    let active = false;
+    textInputs.forEach(inp => { if (inp.value && inp.value.trim() !== '') active = true; });
+    const checks = card.querySelectorAll('input[type="checkbox"]:checked, input[type="radio"]:checked');
+    if (checks.length > 0) active = true;
+    return `<button type="button" class="progress-label ${active ? 'active' : ''}" onclick="jumpToSection('${sections[i]}')" aria-label="Jump to ${l} section">${l}</button>`;
+  }).join('');
+}
+
+/* ================================================================
+   JUMP TO SECTION
+================================================================ */
+function jumpToSection(sectionId) {
+  const card = document.getElementById(sectionId);
+  if (!card) return;
+  // Expand section if collapsed
+  if (card.classList.contains('collapsed')) {
+    card.classList.remove('collapsed');
+  }
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ================================================================
+   STICKY PROGRESS BAR
+================================================================ */
+function initStickyProgress() {
+  const sentinel = document.getElementById('progressSentinel');
+  const bar      = document.getElementById('progressBar');
+  const placeholder = document.getElementById('progressPlaceholder');
+
+  const observer = new IntersectionObserver(([entry]) => {
+    const isSticky = !entry.isIntersecting;
+    bar.classList.toggle('is-sticky', isSticky);
+    placeholder.classList.toggle('active', isSticky);
+    if (isSticky) {
+      // Match placeholder height to bar so layout doesn't jump
+      placeholder.style.height = bar.offsetHeight + 'px';
+    }
+  }, { threshold: 0, rootMargin: '0px' });
+
+  observer.observe(sentinel);
+}
+
+/* ================================================================
+   SUBMIT
+================================================================ */
+function submitForm() {
+  document.getElementById('mainForm').style.display = 'none';
+  const success = document.getElementById('success-screen');
+  success.classList.add('visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ================================================================
+   INIT
+================================================================ */
+window.addEventListener('DOMContentLoaded', () => {
+  // Pre-seed rows
+  addRow('usersRows', userRowTemplate);
+  addRow('reservationRows', reservationRowTemplate);
+  addRow('activityRows', activityRowTemplate);
+  addRow('activityLocationRows', singleRowTemplate('Location Name','act_loc'));
+  addRow('lodgingLocationRows', singleRowTemplate('Lodging Location','lodge_loc'));
+  addRow('roomRows', roomRowTemplate);
+  addRow('membershipRows', membershipRowTemplate);
+  addRow('staffRows', staffRowTemplate);
+  addRow('ratesRows', rateRowTemplate);
+
+  // Sticky progress bar
+  initStickyProgress();
+
+  // Start deposits / tax ready to add
+  updateProgress();
+
+  // Live progress
+  document.getElementById('mainForm').addEventListener('input', updateProgress);
+  document.getElementById('mainForm').addEventListener('change', updateProgress);
+});
+</script>
+</body>
+</html>
