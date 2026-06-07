@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guest Data Cleaner — RBS Onboarding</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a1a; min-height: 100vh; }
+header { background: #1a1a1a; color: #fff; padding: 1rem 2rem; display: flex; align-items: center; gap: 12px; }
+header h1 { font-size: 16px; font-weight: 500; }
+header span { font-size: 12px; opacity: 0.5; }
+.container { max-width: 900px; margin: 0 auto; padding: 2rem 1rem; }
+.section { background: #fff; border: 1px solid #e5e5e5; border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem; }
+.section-title { font-size: 11px; font-weight: 600; color: #888; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 1rem; }
+.upload-zone { border: 1.5px dashed #d0d0d0; border-radius: 8px; padding: 2.5rem; text-align: center; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+.upload-zone:hover { background: #fafafa; border-color: #aaa; }
+.upload-zone .icon { font-size: 32px; display: block; margin-bottom: 10px; }
+.upload-zone p { font-size: 14px; color: #555; }
+.upload-zone small { font-size: 12px; color: #aaa; }
+.mapping-grid { display: grid; grid-template-columns: 1fr 20px 1fr; gap: 5px 8px; align-items: center; }
+.map-label { font-size: 12px; font-weight: 500; padding: 5px 9px; background: #f5f5f3; border-radius: 6px; border: 1px solid #e5e5e5; line-height: 1.4; }
+.map-hint { font-size: 10px; font-weight: 400; color: #aaa; }
+.map-arrow { color: #ccc; font-size: 14px; text-align: center; }
+select { width: 100%; font-size: 12px; padding: 5px 8px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff; color: #1a1a1a; }
+textarea { width: 100%; padding: 8px 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 12px; font-family: 'Courier New', monospace; resize: vertical; color: #1a1a1a; background: #fff; }
+.stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 1rem; }
+.stat-card { background: #f5f5f3; border-radius: 8px; padding: 10px 12px; text-align: center; }
+.stat-num { font-size: 24px; font-weight: 600; color: #1a1a1a; }
+.stat-lbl { font-size: 11px; color: #888; margin-top: 2px; }
+.stat-num.ok { color: #2d7a4f; }
+.stat-num.warn { color: #a85f00; }
+.stat-num.err { color: #c0392b; }
+.issue-list { list-style: none; max-height: 320px; overflow-y: auto; }
+.issue-item { display: flex; align-items: flex-start; gap: 8px; padding: 7px 0; border-bottom: 1px solid #f0f0f0; font-size: 12px; color: #333; }
+.issue-item:last-child { border-bottom: none; }
+.badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; white-space: nowrap; flex-shrink: 0; }
+.badge-warn { background: #fff3cd; color: #856404; }
+.badge-err  { background: #fde8e8; color: #c0392b; }
+.badge-info { background: #dbeafe; color: #1e40af; }
+.badge-ok   { background: #d1fae5; color: #065f46; }
+.preview-wrap { overflow-x: auto; max-height: 260px; overflow-y: auto; border-radius: 8px; border: 1px solid #e5e5e5; }
+table { width: 100%; border-collapse: collapse; font-size: 11px; table-layout: fixed; }
+th { background: #f5f5f3; padding: 6px 8px; font-weight: 600; font-size: 10px; color: #888; text-align: left; position: sticky; top: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid #e5e5e5; }
+td { padding: 5px 8px; border-top: 1px solid #f0f0f0; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+tr.changed td { background: #eff6ff; }
+tr.flagged td { background: #fffbeb; }
+tr.error-row td { background: #fef2f2; }
+.btn { cursor: pointer; font-size: 13px; padding: 8px 16px; border-radius: 7px; font-family: inherit; }
+.btn-primary { background: #1a1a1a; color: #fff; border: none; font-weight: 500; }
+.btn-primary:hover { background: #333; }
+.btn-secondary { background: transparent; border: 1px solid #d0d0d0; color: #333; }
+.btn-secondary:hover { background: #f5f5f3; }
+.tabs { display: flex; gap: 4px; margin-bottom: 1rem; }
+.tab { padding: 5px 14px; font-size: 12px; border-radius: 7px; cursor: pointer; border: 1px solid transparent; color: #888; }
+.tab.active { border-color: #d0d0d0; background: #fff; color: #1a1a1a; font-weight: 500; }
+.hidden { display: none; }
+.flex-end { display: flex; justify-content: flex-end; gap: 8px; margin-top: 1rem; }
+.step-indicator { display: flex; gap: 4px; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.step { font-size: 11px; padding: 3px 11px; border-radius: 99px; background: #ebebeb; color: #aaa; }
+.step.active { background: #1a1a1a; color: #fff; }
+.step.done { background: #d1fae5; color: #065f46; }
+.step-sep { color: #ccc; font-size: 12px; }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #888; }
+.legend-dot { width: 9px; height: 9px; border-radius: 2px; }
+.export-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+.mono-hint { font-size: 11px; color: #666; font-family: 'Courier New', monospace; padding: 10px 12px; background: #f5f5f3; border-radius: 7px; word-break: break-all; line-height: 1.7; margin-top: 1rem; border: 1px solid #e5e5e5; }
+.info-text { font-size: 13px; color: #666; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Guest Data Cleaner</h1>
+  <span>RBS Onboarding Tools</span>
+</header>
+
+<div class="container">
+
+<div class="step-indicator">
+  <span class="step active" id="s1">1 upload</span>
+  <span class="step-sep">›</span>
+  <span class="step" id="s2">2 map columns</span>
+  <span class="step-sep">›</span>
+  <span class="step" id="s3">3 review</span>
+  <span class="step-sep">›</span>
+  <span class="step" id="s4">4 export</span>
+</div>
+
+<!-- STEP 1: UPLOAD -->
+<div id="step-upload">
+  <div class="section">
+    <div class="section-title">Load client data</div>
+    <div class="upload-zone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+      <span class="icon">📂</span>
+      <p>Drop a CSV or TSV here, or click to browse</p>
+      <small>Excel: File → Save As → CSV, then upload here</small>
+    </div>
+    <input type="file" id="fileInput" accept=".csv,.tsv,.txt" style="display:none">
+    <div style="margin-top:1rem;">
+      <p style="font-size:12px;color:#888;margin-bottom:6px;">Or paste tab- or comma-separated data:</p>
+      <textarea id="pasteInput" rows="5" placeholder="Paste data here with headers in the first row..."></textarea>
+      <div class="flex-end" style="margin-top:6px;">
+        <button class="btn btn-secondary" onclick="loadPasted()">Load pasted data</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 2: MAP -->
+<div id="step-map" class="hidden">
+  <div class="section">
+    <div class="section-title">Map columns to import fields</div>
+    <p class="info-text" style="margin-bottom:1rem;">Auto-matched where possible. Adjust anything that didn't align. Leave unused fields as "skip".</p>
+    <div class="mapping-grid" id="mappingGrid"></div>
+    <div class="flex-end">
+      <button class="btn btn-secondary" onclick="goStep(1)">Back</button>
+      <button class="btn btn-primary" onclick="runClean()">Clean data →</button>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 3: REVIEW -->
+<div id="step-review" class="hidden">
+  <div class="section">
+    <div class="section-title">Cleaning summary</div>
+    <div class="stat-row" id="statRow"></div>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('issues')">Issues</div>
+      <div class="tab" onclick="switchTab('preview')">Data preview</div>
+    </div>
+    <div id="tab-issues"><ul class="issue-list" id="issueList"></ul></div>
+    <div id="tab-preview" class="hidden">
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#eff6ff"></div>auto-fixed</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#fffbeb"></div>needs review</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#fef2f2"></div>error</div>
+      </div>
+      <div class="preview-wrap"><table><thead id="previewHead"></thead><tbody id="previewBody"></tbody></table></div>
+    </div>
+    <div class="flex-end">
+      <button class="btn btn-secondary" onclick="goStep(2)">Back</button>
+      <button class="btn btn-primary" onclick="goStep(4)">Export →</button>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 4: EXPORT -->
+<div id="step-export" class="hidden">
+  <div class="section">
+    <div class="section-title">Export</div>
+    <div class="export-grid">
+      <div class="stat-card"><div class="stat-num ok" id="exp-clean">0</div><div class="stat-lbl">clean rows → MySQL TSV</div></div>
+      <div class="stat-card"><div class="stat-num warn" id="exp-flagged">0</div><div class="stat-lbl">flagged → review report</div></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="downloadTSV(false)">⬇ Clean TSV for MySQL</button>
+      <button class="btn btn-secondary" onclick="downloadTSV(true)">⚑ Flagged rows TSV</button>
+      <button class="btn btn-secondary" onclick="downloadFlagReport()">📄 Flag report CSV</button>
+    </div>
+    <div class="mono-hint" id="mysqlHint"></div>
+    <div class="flex-end">
+      <button class="btn btn-secondary" onclick="goStep(3)">Back</button>
+      <button class="btn btn-secondary" onclick="resetAll()">↺ Start over</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+const COUNTRY_DB = [
+  {id:1,  abbr:'CA', names:['canada','can']},
+  {id:2,  abbr:'FR', names:['france','fra']},
+  {id:3,  abbr:'DE', names:['germany','deutschland','deu','ger']},
+  {id:4,  abbr:'IT', names:['italy','italia','ita']},
+  {id:5,  abbr:'ES', names:['spain','españa','espana','esp']},
+  {id:6,  abbr:'GB', names:['united kingdom','uk','great britain','britain','england','eng','gbr']},
+  {id:7,  abbr:'US', names:['united states','usa','us','u.s.','u.s.a.','united states of america','america']},
+  {id:8,  abbr:'MX', names:['mexico','méxico','mex']},
+  {id:9,  abbr:'NL', names:['netherlands','holland','ned','nld']},
+  {id:10, abbr:'AU', names:['australia','aus']},
+  {id:11, abbr:'NZ', names:['new zealand','nzl']},
+  {id:12, abbr:'SG', names:['singapore','sgp']},
+  {id:13, abbr:'IL', names:['israel','isr']},
+  {id:14, abbr:'ID', names:['indonesia','idn']},
+  {id:15, abbr:'IE', names:['ireland','irl','eire']},
+  {id:16, abbr:'CH', names:['switzerland','swiss','che']},
+  {id:17, abbr:'BE', names:['belgium','belgique','bel']},
+  {id:18, abbr:'NO', names:['norway','norge','nor']},
+  {id:19, abbr:'SE', names:['sweden','sverige','swe']},
+  {id:20, abbr:'CZ', names:['czech republic','czechia','czech','cze']},
+  {id:21, abbr:'HU', names:['hungary','magyarország','hun']},
+  {id:22, abbr:'CN', names:['china','prc','chn','peoples republic of china']},
+  {id:23, abbr:'HK', names:['hong kong','hkg']},
+  {id:24, abbr:'MO', names:['macau','macao','mac']},
+  {id:25, abbr:'PT', names:['portugal','prt']},
+  {id:26, abbr:'KR', names:['south korea','korea','kor','republic of korea']},
+  {id:27, abbr:'AR', names:['argentina','arg']},
+  {id:28, abbr:'DK', names:['denmark','danmark','dnk']},
+  {id:29, abbr:'AT', names:['austria','österreich','aut']},
+  {id:30, abbr:'FI', names:['finland','suomi','fin']},
+  {id:31, abbr:'ZA', names:['south africa','rsa','zaf']},
+  {id:32, abbr:'AE', names:['united arab emirates','uae','emirates','are']},
+  {id:33, abbr:'PF', names:['french polynesia','tahiti','pyf']},
+  {id:34, abbr:'PL', names:['poland','polska','pol']},
+  {id:35, abbr:'JP', names:['japan','jpn']},
+  {id:36, abbr:'SA', names:['saudi arabia','ksa','sau']},
+  {id:37, abbr:'IN', names:['india','ind']},
+  {id:38, abbr:'PK', names:['pakistan','pak']},
+  {id:39, abbr:'MY', names:['malaysia','mys']},
+  {id:40, abbr:'TR', names:['turkey','türkiye','turkiye','tur']},
+  {id:41, abbr:'TH', names:['thailand','thai','tha']},
+  {id:42, abbr:'IR', names:['iran','irn','persia']},
+  {id:43, abbr:'NI', names:['nicaragua','nic']},
+  {id:44, abbr:'PA', names:['panama','pan']},
+  {id:45, abbr:'BU', names:['bermuda','bmu','ber']},
+  {id:46, abbr:'BB', names:['barbados','brb']},
+  {id:47, abbr:'EC', names:['ecuador','ecu']},
+  {id:48, abbr:'BR', names:['brazil','brasil','bra']},
+  {id:49, abbr:'CO', names:['colombia','col']},
+  {id:50, abbr:'BS', names:['bahamas','the bahamas','bhs']},
+  {id:51, abbr:'TZ', names:['tanzania','tza']},
+  {id:52, abbr:'KY', names:['cayman islands','cayman','cym']},
+  {id:53, abbr:'CR', names:['costa rica','cri']},
+  {id:54, abbr:'GN', names:['guinea','gin']},
+  {id:55, abbr:'JE', names:['jersey','jersey channel islands','jey']},
+  {id:56, abbr:'VI', names:['u.s virgin islands','us virgin islands','usvi','vir']},
+  {id:57, abbr:'GT', names:['guatemala','guatamala','gtm']},
+  {id:58, abbr:'VN', names:['vietnam','viet nam','vnm']},
+  {id:59, abbr:'BW', names:['botswana','bwa']},
+  {id:60, abbr:'IS', names:['iceland','isl']},
+  {id:61, abbr:'KW', names:['kuwait','kwt']},
+  {id:62, abbr:'SC', names:['scotland','sct']},
+  {id:63, abbr:'SK', names:['slovakia','svk']},
+  {id:64, abbr:'QA', names:['qatar','qat']},
+  {id:65, abbr:'BH', names:['bahrain','bhr']},
+  {id:66, abbr:'RU', names:['russia','russian federation','rus']},
+  {id:67, abbr:'UA', names:['ukraine','ukr']},
+];
+
+function resolveCountry(val) {
+  if (!val || !val.trim()) return {code:'', flagged:false};
+  const v = val.trim();
+  const numCheck = parseInt(v, 10);
+  if (!isNaN(numCheck) && COUNTRY_DB.find(c => c.id === numCheck)) return {code: numCheck, flagged: false};
+  const upper = v.toUpperCase();
+  const abbrMatch = COUNTRY_DB.find(c => c.abbr === upper);
+  if (abbrMatch) return {code: abbrMatch.id, flagged: false};
+  const lower = v.toLowerCase().trim();
+  const nameMatch = COUNTRY_DB.find(c => c.names.includes(lower));
+  if (nameMatch) return {code: nameMatch.id, flagged: false};
+  return {code: v, flagged: true, reason: `Unknown country: "${v}" — not in countrysetup`};
+}
+
+const TARGET_FIELDS = [
+  {key:'GuestID',       label:'GuestID',             hint:'numeric ID'},
+  {key:'FirstName',     label:'First name',           hint:''},
+  {key:'LastName',      label:'Last name',            hint:''},
+  {key:'MiddleInit',    label:'Middle initial',       hint:''},
+  {key:'Salutation',    label:'Salutation',           hint:'Mr, Mrs, Dr…'},
+  {key:'Email',         label:'Email (primary)',      hint:''},
+  {key:'Email2',        label:'Email 2',              hint:'optional'},
+  {key:'Email3',        label:'Email 3',              hint:'optional'},
+  {key:'HomePhone',     label:'Home phone',           hint:''},
+  {key:'MobilePhone',   label:'Mobile phone',         hint:''},
+  {key:'WorkPhone',     label:'Work phone',           hint:''},
+  {key:'WorkExtension', label:'Work ext',             hint:''},
+  {key:'FaxPhone',      label:'Fax',                  hint:''},
+  {key:'Company',       label:'Company',              hint:''},
+  {key:'JobTitle',      label:'Job title',            hint:''},
+  {key:'Address1',      label:'Address line 1',       hint:''},
+  {key:'Address2',      label:'Address line 2',       hint:''},
+  {key:'City',          label:'City',                 hint:''},
+  {key:'StateOrProvince',label:'State / Province',    hint:''},
+  {key:'PostalCode',    label:'Postal code',          hint:''},
+  {key:'Country',       label:'Country',              hint:'name, abbr, or ID'},
+  {key:'SecondAddress', label:'2nd address line 1',   hint:''},
+  {key:'SecondAddress2',label:'2nd address line 2',   hint:''},
+  {key:'SecondCity',    label:'2nd city',             hint:''},
+  {key:'SecondStateOrProvince',label:'2nd state',     hint:''},
+  {key:'SecondPostalCode',label:'2nd postal code',    hint:''},
+  {key:'SecondCountry', label:'2nd country',          hint:'name, abbr, or ID'},
+  {key:'DOB',           label:'Date of birth',        hint:'YYYY-MM-DD'},
+  {key:'Notes',         label:'Notes',                hint:''},
+  {key:'ClientStatus',  label:'Client status',        hint:''},
+  {key:'EntryDate',     label:'Entry date',           hint:'YYYY-MM-DD'},
+  {key:'Tag1',          label:'Tag 1',                hint:''},
+  {key:'Tag2',          label:'Tag 2',                hint:''},
+  {key:'Tag3',          label:'Tag 3',                hint:''},
+  {key:'Tag4',          label:'Tag 4',                hint:''},
+  {key:'Tag5',          label:'Tag 5',                hint:''},
+];
+
+const SQL_SPECIAL = /['"\\\x00-\x1F\x7F;`]/g;
+const ADDR_RE = /^(.+?),\s*([A-Za-z\s\.]+),\s*([A-Z]{2})\s+(\d{5}(?:-\d{4})?)/;
+
+let rawHeaders=[], rawRows=[], mapping={}, cleanedRows=[], issues=[], flagReport=[], rowStatus=[];
+
+function goStep(n) {
+  ['step-upload','step-map','step-review','step-export'].forEach((id,i) => {
+    document.getElementById(id).classList.toggle('hidden', i+1 !== n);
+  });
+  ['s1','s2','s3','s4'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.className = 'step' + (i+1===n ? ' active' : i+1<n ? ' done' : '');
+  });
+}
+
+function parseDelimited(text) {
+  const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').trim().split('\n');
+  if (!lines.length) return {headers:[], rows:[]};
+  const sep = lines[0].includes('\t') ? '\t' : ',';
+  function pl(line) {
+    const cols=[]; let cur='', inQ=false;
+    for (let i=0; i<line.length; i++) {
+      const c = line[i];
+      if (c==='"') { inQ=!inQ; continue; }
+      if (c===sep && !inQ) { cols.push(cur); cur=''; continue; }
+      cur += c;
+    }
+    cols.push(cur);
+    return cols;
+  }
+  const headers = pl(lines[0]).map(h => h.trim());
+  const rows = lines.slice(1).filter(l => l.trim()).map(l => {
+    const vals = pl(l); const obj = {};
+    headers.forEach((h,i) => { obj[h] = (vals[i]||'').trim(); });
+    return obj;
+  });
+  return {headers, rows};
+}
+
+function loadParsed(p) { rawHeaders=p.headers; rawRows=p.rows; buildMapping(); goStep(2); }
+function loadPasted() { const t=document.getElementById('pasteInput').value; if(t.trim()) loadParsed(parseDelimited(t)); }
+
+document.getElementById('fileInput').addEventListener('change', e => {
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=ev=>loadParsed(parseDelimited(ev.target.result)); r.readAsText(f);
+});
+
+const dz = document.getElementById('dropzone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.background='#fafafa'; dz.style.borderColor='#aaa'; });
+dz.addEventListener('dragleave', () => { dz.style.background=''; dz.style.borderColor=''; });
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.style.background=''; dz.style.borderColor='';
+  const f=e.dataTransfer.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=ev=>loadParsed(parseDelimited(ev.target.result)); r.readAsText(f);
+});
+
+function norm(s) { return s.toLowerCase().replace(/[^a-z0-9]/g,''); }
+
+function autoMatch(srcH) {
+  const n = norm(srcH);
+  for (const tf of TARGET_FIELDS) { if (norm(tf.key)===n || norm(tf.label)===n) return tf.key; }
+  const aliases = {
+    firstname:['fname','first','givenname','given'],
+    lastname:['lname','last','surname','familyname','family'],
+    email:['emailaddress','primaryemail','email1','emailprimary'],
+    email2:['secondemail','alternateemail'],
+    email3:['thirdemail'],
+    mobilephone:['cell','cellphone','mobile','mobilenum'],
+    homephone:['home','hphone','homenum'],
+    workphone:['work','business','bphone','businessphone','officephone'],
+    workextension:['ext','extension','workext'],
+    address1:['address','street','streetaddress','addr1','addr','streetaddr'],
+    address2:['suite','apt','unit','addr2'],
+    city:['town','municipality'],
+    stateorprovince:['state','province','stateprovince','region','prov'],
+    postalcode:['zip','zipcode','postal','postcode','postalzip'],
+    country:['countryname','nation','countrycode'],
+    company:['organization','employer','companyname','org','business'],
+    dob:['birthdate','birthday','dateofbirth','birth','bday'],
+    notes:['note','comments','comment','memo','remarks'],
+    guestid:['id','guestno','guestnumber','recordid'],
+    jobtitle:['title','position','role','occupation'],
+    salutation:['prefix','greeting','honorific'],
+    middleinit:['middle','middlename','mi','middleinitial'],
+  };
+  for (const [key,alts] of Object.entries(aliases)) {
+    if (alts.includes(n)) { const tf=TARGET_FIELDS.find(t=>norm(t.key)===key); if(tf) return tf.key; }
+  }
+  return '';
+}
+
+function buildMapping() {
+  const grid = document.getElementById('mappingGrid');
+  grid.innerHTML = ''; mapping = {};
+  TARGET_FIELDS.forEach(tf => {
+    let autoVal = '';
+    for (const h of rawHeaders) { if (autoMatch(h)===tf.key) { autoVal=h; break; } }
+    const ld = document.createElement('div'); ld.className='map-label';
+    ld.innerHTML = tf.label + (tf.hint ? `<br><span class="map-hint">${tf.hint}</span>` : '');
+    const ar = document.createElement('div'); ar.className='map-arrow'; ar.textContent='←';
+    const sel = document.createElement('select');
+    const o0 = document.createElement('option'); o0.value=''; o0.textContent='— skip —'; sel.appendChild(o0);
+    rawHeaders.forEach(h => {
+      const o=document.createElement('option'); o.value=h; o.textContent=h;
+      if (h===autoVal) o.selected=true; sel.appendChild(o);
+    });
+    sel.addEventListener('change', () => { mapping[tf.key]=sel.value; });
+    mapping[tf.key] = autoVal;
+    grid.appendChild(ld); grid.appendChild(ar); grid.appendChild(sel);
+  });
+}
+
+function cleanPhone(v) {
+  if (!v) return '';
+  const d = v.replace(/\D/g,''); if (!d) return '';
+  if (d.length===10) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
+  if (d.length===11 && d[0]==='1') return `+1 (${d.slice(1,4)}) ${d.slice(4,7)}-${d.slice(7)}`;
+  return d;
+}
+function cleanEmail(v) { return (v||'').toLowerCase().trim(); }
+function cleanName(v) { if (!v) return ''; return v.trim().replace(/\b\w/g, c=>c.toUpperCase()); }
+function cleanSQL(v) { if (!v) return ''; return v.replace(SQL_SPECIAL,' ').replace(/\s+/g,' ').trim(); }
+function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function cleanDate(v) {
+  if (!v) return '';
+  const d = new Date(v); if (isNaN(d)) return v;
+  return d.toISOString().slice(0,10)+' 00:00:00';
+}
+function tryParseAddr(v) {
+  if (!v) return null;
+  const m = v.match(ADDR_RE);
+  if (m) return {Address1:m[1].trim(), City:m[2].trim(), StateOrProvince:m[3].trim(), PostalCode:m[4].trim()};
+  const parts = v.split(',').map(s=>s.trim()).filter(Boolean);
+  if (parts.length>=3) return {Address1:parts[0], City:parts[1], StateOrProvince:parts[2], PostalCode:parts[3]||''};
+  return null;
+}
+function get(row, field) { const src=mapping[field]; return src?(row[src]||'').trim():''; }
+
+function runClean() {
+  cleanedRows=[]; issues=[]; flagReport=[]; rowStatus=[];
+  const emailsSeen = {};
+
+  rawRows.forEach((row, idx) => {
+    const rowNum = idx+2;
+    const r = {}; let changed=false, flagged=false; const rowIssues=[];
+    TARGET_FIELDS.forEach(tf => { r[tf.key]=get(row,tf.key); });
+
+    ['FirstName','LastName','Company','JobTitle','Salutation'].forEach(f => {
+      const orig=r[f]; r[f]=cleanName(cleanSQL(orig));
+      if (r[f]!==orig && orig) changed=true;
+    });
+    ['MiddleInit','Notes','ClientStatus'].forEach(f => {
+      const orig=r[f]; r[f]=cleanSQL(orig);
+      if (r[f]!==orig && orig) changed=true;
+    });
+    ['HomePhone','MobilePhone','WorkPhone','FaxPhone'].forEach(f => {
+      const orig=r[f]; r[f]=cleanPhone(orig);
+      if (r[f]!==orig && orig) changed=true;
+    });
+    ['Email','Email2','Email3'].forEach(f => {
+      const orig=r[f]; if (!orig) return;
+      r[f]=cleanEmail(orig); if (r[f]!==orig) changed=true;
+      if (!isValidEmail(r[f])) {
+        flagged=true;
+        rowIssues.push({type:'warn', msg:`Row ${rowNum}: invalid email in ${f} — "${r[f]}"`});
+      } else {
+        if (emailsSeen[r[f]]!==undefined) {
+          flagged=true;
+          rowIssues.push({type:'warn', msg:`Row ${rowNum}: duplicate email "${r[f]}" (also row ${emailsSeen[r[f]]})`});
+        } else { emailsSeen[r[f]]=rowNum; }
+      }
+    });
+    ['DOB','EntryDate'].forEach(f => {
+      const orig=r[f]; if (!orig) return;
+      r[f]=cleanDate(orig); if (r[f]!==orig) changed=true;
+    });
+    ['Address1','Address2','City','StateOrProvince','PostalCode',
+     'SecondAddress','SecondAddress2','SecondCity','SecondStateOrProvince','SecondPostalCode'].forEach(f => {
+      const orig=r[f]; r[f]=cleanSQL(orig); if (r[f]!==orig && orig) changed=true;
+    });
+    if (r.Address1 && !r.City) {
+      const parsed=tryParseAddr(r.Address1);
+      if (parsed) { Object.assign(r,parsed); changed=true; rowIssues.push({type:'info', msg:`Row ${rowNum}: parsed one-line address into separate fields`}); }
+    }
+    ['Country','SecondCountry'].forEach(f => {
+      const orig=r[f]; if (!orig) return;
+      const res=resolveCountry(orig); r[f]=String(res.code);
+      if (res.flagged) { flagged=true; rowIssues.push({type:'warn', msg:`Row ${rowNum}: ${res.reason}`}); }
+      else if (String(res.code)!==orig) changed=true;
+    });
+    ['Tag1','Tag2','Tag3','Tag4','Tag5'].forEach(f => {
+      const orig=r[f]; r[f]=cleanSQL(orig).toUpperCase(); if (r[f]!==orig && orig) changed=true;
+    });
+    const tags=['Tag1','Tag2','Tag3','Tag4','Tag5'].map(f=>r[f]).filter(Boolean);
+    const uTags=[...new Set(tags)];
+    if (uTags.length<tags.length) { changed=true; rowIssues.push({type:'info', msg:`Row ${rowNum}: removed duplicate tags`}); }
+    uTags.forEach((t,i)=>{ r[`Tag${i+1}`]=t; });
+    for (let i=uTags.length+1; i<=5; i++) r[`Tag${i}`]='';
+
+    if (r.GuestID && !/^\d+$/.test(r.GuestID.trim())) {
+      flagged=true; rowIssues.push({type:'err', msg:`Row ${rowNum}: GuestID "${r.GuestID}" is not numeric`});
+    }
+    if (!r.FirstName && !r.LastName && !r.Email) {
+      flagged=true; rowIssues.push({type:'err', msg:`Row ${rowNum}: no name or email — may be blank or a header row`});
+    }
+
+    rowIssues.forEach(i=>issues.push(i));
+    if (rowIssues.length) flagReport.push({rowNum, ...r, _issues: rowIssues.map(i=>i.msg).join(' | ')});
+    cleanedRows.push(r);
+    rowStatus.push(flagged?'flagged':changed?'changed':'ok');
+  });
+
+  renderReview(); goStep(3);
+}
+
+function renderReview() {
+  const total=cleanedRows.length;
+  const flagged=rowStatus.filter(s=>s==='flagged').length;
+  const changed=rowStatus.filter(s=>s==='changed').length;
+  document.getElementById('statRow').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-lbl">total rows</div></div>
+    <div class="stat-card"><div class="stat-num ok">${total-flagged}</div><div class="stat-lbl">clean</div></div>
+    <div class="stat-card"><div class="stat-num warn">${changed}</div><div class="stat-lbl">auto-fixed</div></div>
+    <div class="stat-card"><div class="stat-num err">${flagged}</div><div class="stat-lbl">needs review</div></div>`;
+  const ul=document.getElementById('issueList');
+  if (!issues.length) {
+    ul.innerHTML='<li class="issue-item"><span class="badge badge-ok">All clear</span> No issues found — data looks clean!</li>';
+  } else {
+    ul.innerHTML=issues.slice(0,100).map(i=>{
+      const cls=i.type==='err'?'badge-err':i.type==='warn'?'badge-warn':'badge-info';
+      const lbl=i.type==='err'?'error':i.type==='warn'?'review':'fixed';
+      return `<li class="issue-item"><span class="badge ${cls}">${lbl}</span><span>${i.msg}</span></li>`;
+    }).join('');
+    if (issues.length>100) ul.innerHTML+=`<li class="issue-item"><span class="badge badge-info">+${issues.length-100} more in flag report</span></li>`;
+  }
+  const dispF=TARGET_FIELDS.filter(tf=>mapping[tf.key]).slice(0,9);
+  document.getElementById('previewHead').innerHTML='<tr>'+dispF.map(f=>`<th style="min-width:70px">${f.label}</th>`).join('')+'</tr>';
+  document.getElementById('previewBody').innerHTML=cleanedRows.slice(0,25).map((r,i)=>{
+    const cls=rowStatus[i]==='flagged'?'flagged':rowStatus[i]==='changed'?'changed':'';
+    return `<tr class="${cls}">`+dispF.map(f=>`<td title="${r[f.key]||''}">${r[f.key]||''}</td>`).join('')+'</tr>';
+  }).join('');
+  document.getElementById('exp-clean').textContent=cleanedRows.filter((_,i)=>rowStatus[i]!=='flagged').length;
+  document.getElementById('exp-flagged').textContent=cleanedRows.filter((_,i)=>rowStatus[i]==='flagged').length;
+  document.getElementById('mysqlHint').textContent=`LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.3/Uploads/guest_import_clean.tsv'\nINTO TABLE guestsetuptemporarytable\nFIELDS TERMINATED BY '\\t'\nLINES TERMINATED BY '\\n'\nIGNORE 1 ROWS;`;
+}
+
+function switchTab(t) {
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['issues','preview'][i]===t));
+  document.getElementById('tab-issues').classList.toggle('hidden',t!=='issues');
+  document.getElementById('tab-preview').classList.toggle('hidden',t!=='preview');
+}
+
+function rowsToTSV(rows) {
+  const headers=TARGET_FIELDS.map(tf=>tf.key);
+  return [headers.join('\t'), ...rows.map(r=>headers.map(h=>r[h]||'').join('\t'))].join('\n');
+}
+function downloadTSV(flaggedOnly) {
+  const rows=cleanedRows.filter((_,i)=>flaggedOnly?rowStatus[i]==='flagged':rowStatus[i]!=='flagged');
+  triggerDownload(rowsToTSV(rows), flaggedOnly?'guest_import_flagged.tsv':'guest_import_clean.tsv', 'text/tab-separated-values');
+}
+function downloadFlagReport() {
+  if (!flagReport.length) { alert('No flagged rows.'); return; }
+  const headers=['rowNum','_issues',...TARGET_FIELDS.map(tf=>tf.key)];
+  const lines=[headers.join(','),...flagReport.map(r=>headers.map(h=>'"'+(String(r[h]||'')).replace(/"/g,'""')+'"').join(','))];
+  triggerDownload(lines.join('\n'),'guest_import_flag_report.csv','text/csv');
+}
+function triggerDownload(content, fname, mime) {
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([content],{type:mime}));
+  a.download=fname; a.click();
+}
+function resetAll() {
+  rawHeaders=[]; rawRows=[]; mapping={}; cleanedRows=[]; issues=[]; flagReport=[]; rowStatus=[];
+  document.getElementById('fileInput').value='';
+  document.getElementById('pasteInput').value='';
+  goStep(1);
+}
+</script>
+</body>
+</html>
