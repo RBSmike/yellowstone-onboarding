@@ -309,6 +309,8 @@ function goStep(n) {
 }
 
 function parseDelimited(text) {
+  // Strip UTF-8 BOM (EF BB BF) and any other leading invisible characters Excel adds
+  text = text.replace(/^\uFEFF/, '').replace(/^\u00EF\u00BB\u00BF/, '');
   const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').trim().split('\n');
   if (!lines.length) return {headers:[], rows:[]};
   const sep = lines[0].includes('\t') ? '\t' : ',';
@@ -323,7 +325,12 @@ function parseDelimited(text) {
     cols.push(cur);
     return cols;
   }
-  const headers = pl(lines[0]).map(h => h.trim());
+  // Strip BOM from first header in case it survived as raw bytes
+  const headers = pl(lines[0]).map((h,i) => {
+    let clean = h.trim();
+    if (i === 0) clean = clean.replace(/^[\uFEFF\u00EF\u00BB\u00BF\u200B\u200C\u200D\uFFFE]+/, '');
+    return clean;
+  });
   const rows = lines.slice(1).filter(l => l.trim()).map(l => {
     const vals = pl(l); const obj = {};
     headers.forEach((h,i) => { obj[h] = (vals[i]||'').trim(); });
@@ -337,7 +344,7 @@ function loadPasted() { const t=document.getElementById('pasteInput').value; if(
 
 document.getElementById('fileInput').addEventListener('change', e => {
   const f=e.target.files[0]; if(!f) return;
-  const r=new FileReader(); r.onload=ev=>loadParsed(parseDelimited(ev.target.result)); r.readAsText(f);
+  const r=new FileReader(); r.onload=ev=>loadParsed(parseDelimited(ev.target.result)); r.readAsText(f, 'UTF-8');
 });
 
 const dz = document.getElementById('dropzone');
@@ -346,7 +353,7 @@ dz.addEventListener('dragleave', () => { dz.style.background=''; dz.style.border
 dz.addEventListener('drop', e => {
   e.preventDefault(); dz.style.background=''; dz.style.borderColor='';
   const f=e.dataTransfer.files[0]; if(!f) return;
-  const r=new FileReader(); r.onload=ev=>loadParsed(parseDelimited(ev.target.result)); r.readAsText(f);
+  const r=new FileReader(); r.onload=ev=>loadParsed(parseDelimited(ev.target.result)); r.readAsText(f, 'UTF-8');
 });
 
 function norm(s) { return s.toLowerCase().replace(/[^a-z0-9]/g,''); }
