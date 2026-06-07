@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Guest Data Cleaner — RBS Onboarding</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a1a; min-height: 100vh; }
@@ -94,10 +95,10 @@ tr.error-row td { background: #fef2f2; }
     <div class="section-title">Load client data</div>
     <div class="upload-zone" id="dropzone" onclick="document.getElementById('fileInput').click()">
       <span class="icon">📂</span>
-      <p>Drop a CSV or TSV here, or click to browse</p>
-      <small>Excel: File → Save As → CSV, then upload here</small>
+      <p>Drop an Excel or CSV file here, or click to browse</p>
+      <small>Accepts .xlsx, .xls, .csv, and .tsv — no conversion needed</small>
     </div>
-    <input type="file" id="fileInput" accept=".csv,.tsv,.txt" style="display:none">
+    <input type="file" id="fileInput" accept=".xlsx,.xls,.csv,.tsv,.txt" style="display:none">
     <div style="margin-top:1rem;">
       <p style="font-size:12px;color:#888;margin-bottom:6px;">Or paste tab- or comma-separated data:</p>
       <textarea id="pasteInput" rows="5" placeholder="Paste data here with headers in the first row..."></textarea>
@@ -342,18 +343,42 @@ function parseDelimited(text) {
 function loadParsed(p) { rawHeaders=p.headers; rawRows=p.rows; buildMapping(); goStep(2); }
 function loadPasted() { const t=document.getElementById('pasteInput').value; if(t.trim()) loadParsed(parseDelimited(t)); }
 
-document.getElementById('fileInput').addEventListener('change', e => {
-  const f=e.target.files[0]; if(!f) return;
-  const r=new FileReader(); r.onload=ev=>loadParsed(parseDelimited(ev.target.result)); r.readAsText(f, 'UTF-8');
-});
+function handleFile(f) {
+  if (!f) return;
+  const isExcel = /\.(xlsx|xls)$/i.test(f.name);
+  const r = new FileReader();
+  if (isExcel) {
+    r.onload = ev => {
+      try {
+        const data = new Uint8Array(ev.target.result);
+        const wb = XLSX.read(data, {type: 'array', cellDates: true});
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+        if (!json.length) return alert('Sheet appears empty.');
+        const headers = json[0].map(h => String(h).trim());
+        const rows = json.slice(1).filter(r => r.some(c => String(c).trim())).map(r => {
+          const obj = {};
+          headers.forEach((h,i) => { obj[h] = String(r[i]===undefined?'':r[i]).trim(); });
+          return obj;
+        });
+        loadParsed({headers, rows});
+      } catch(e) { alert('Could not read Excel file: ' + e.message); }
+    };
+    r.readAsArrayBuffer(f);
+  } else {
+    r.onload = ev => loadParsed(parseDelimited(ev.target.result));
+    r.readAsText(f, 'UTF-8');
+  }
+}
+
+document.getElementById('fileInput').addEventListener('change', e => handleFile(e.target.files[0]));
 
 const dz = document.getElementById('dropzone');
 dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.background='#fafafa'; dz.style.borderColor='#aaa'; });
 dz.addEventListener('dragleave', () => { dz.style.background=''; dz.style.borderColor=''; });
 dz.addEventListener('drop', e => {
   e.preventDefault(); dz.style.background=''; dz.style.borderColor='';
-  const f=e.dataTransfer.files[0]; if(!f) return;
-  const r=new FileReader(); r.onload=ev=>loadParsed(parseDelimited(ev.target.result)); r.readAsText(f, 'UTF-8');
+  handleFile(e.dataTransfer.files[0]);
 });
 
 function norm(s) { return s.toLowerCase().replace(/[^a-z0-9]/g,''); }
